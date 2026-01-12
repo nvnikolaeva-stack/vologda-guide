@@ -419,6 +419,104 @@
             margin-bottom: 1.5rem;
         }
 
+        /* Reviews Section */
+        .reviews-section {
+            background: #F8F6F2;
+            padding: 5rem 2rem;
+        }
+
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--hover));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Yeseva One', serif;
+            flex-shrink: 0;
+        }
+
+        .review-author {
+            font-family: 'Yeseva One', serif;
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin: 0;
+            color: var(--heading);
+        }
+
+        .review-text {
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text);
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Сворачиваемый блок отзывов */
+        .reviews-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: default;
+        }
+
+        .reviews-toggle-icon {
+            display: none;
+            font-size: 1rem;
+            color: var(--accent);
+            transition: transform 0.3s ease;
+        }
+
+        .reviews-content {
+            overflow: hidden;
+            transition: max-height 0.4s ease, opacity 0.4s ease;
+        }
+
+        /* На десктопе блок всегда развёрнут */
+        @media (min-width: 768px) {
+            .reviews-content {
+                max-height: none !important;
+                opacity: 1 !important;
+            }
+
+            .reviews-title {
+                cursor: default;
+            }
+        }
+
         /* Footer */
         footer {
             background: var(--heading);
@@ -580,6 +678,10 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .reviews-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .section-title {
                 font-size: 2rem;
             }
@@ -670,6 +772,55 @@
                 max-height: 500px;
                 opacity: 1;
                 margin-top: 0.8rem;
+            }
+
+            /* Reviews Section на мобильных */
+            .reviews-section {
+                padding: 2rem 1rem;
+            }
+
+            .reviews-title {
+                cursor: pointer;
+                user-select: none;
+            }
+
+            .reviews-toggle-icon {
+                display: block;
+            }
+
+            .reviews-content {
+                max-height: 0;
+                opacity: 0;
+            }
+
+            .reviews-content.expanded {
+                max-height: 5000px;
+                opacity: 1;
+            }
+
+            .reviews-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .review-card {
+                padding: 1.2rem;
+            }
+
+            .review-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .review-author {
+                font-size: 0.85rem;
+            }
+
+            .review-text {
+                font-size: 0.8rem;
+                line-height: 1.6;
             }
         }
 
@@ -1166,6 +1317,60 @@
         </div>
     </section>
 
+    <!-- Reviews Section -->
+    <section id="reviews" class="fade-in reviews-section">
+        <h2 class="section-title reviews-title" id="reviews-title">
+            <span>💬 Отзывы</span>
+            <span class="reviews-toggle-icon">▼</span>
+        </h2>
+        <div class="reviews-content">
+            <div class="reviews-grid">
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">А</div>
+                    <h3 class="review-author">Аня</h3>
+                </div>
+                <p class="review-text">Мы ехали в Вологду на выходные, и этот сайт реально спас. Я просто открыла маршрут и тыкала по точкам — сразу видно, куда идти. Карта удобная, ничего не надо гуглить отдельно. И фотки помогли понять, что мы вообще ищем.</p>
+            </div>
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">К</div>
+                    <h3 class="review-author">Кира</h3>
+                </div>
+                <p class="review-text">Сайт классный, прям вайб. Не как скучный путеводитель, а как "пойдём, покажу места". Мы с подругой прошли маршрут за пару часов, по дороге фоткались у домов. Понравилось, что всё коротко и по делу, без километров текста.</p>
+            </div>
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">М</div>
+                    <h3 class="review-author">Миша</h3>
+                </div>
+                <p class="review-text">Я обычно не люблю планировать, но тут всё просто: открыл, нажал — пошёл. Удобно, что есть точки на карте и можно быстро понять, где ты находишься. Мы не потерялись ни разу. В итоге прошли почти всё и нормально уложились по времени.</p>
+            </div>
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">Л</div>
+                    <h3 class="review-author">Лена</h3>
+                </div>
+                <p class="review-text">Мне понравилось, что сайт помогает смотреть на город внимательнее. Я раньше мимо таких домов проходила и не замечала. А тут читаешь короткое описание — и начинаешь реально рассматривать окна, резьбу, детали. В итоге прогулка стала не просто "погуляли", а прям маленькое путешествие.</p>
+            </div>
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">О</div>
+                    <h3 class="review-author">Ольга</h3>
+                </div>
+                <p class="review-text">Ездили с друзьями, и было важно, чтобы всё работало на телефоне. Сайт грузится быстро, маршрут понятный, адреса не надо переписывать. Понравилось, что можно планировать день: сначала прогулка, потом кафе, потом музей. Очень удобно, особенно если в городе впервые.</p>
+            </div>
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-avatar">С</div>
+                    <h3 class="review-author">Сергей</h3>
+                </div>
+                <p class="review-text">Хороший, аккуратный сайт. Ничего лишнего — открыл и пошёл по маршруту. Удобно, что всё собрано в одном месте: куда сходить, где поесть, где остановиться. Мы были компанией, и сайт помог быстро решить "что делаем сегодня", без долгих поисков.</p>
+            </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer>
         <div class="footer-content">
@@ -1450,6 +1655,50 @@
                 allDetails.forEach(el => el.classList.remove('expanded'));
                 allToggles.forEach(el => el.classList.remove('rotated'));
             }
+        });
+
+        // Сворачиваемый блок отзывов на мобильных
+        const reviewsTitle = document.getElementById('reviews-title');
+        const reviewsContent = document.querySelector('.reviews-content');
+        const reviewsToggleIcon = document.querySelector('.reviews-toggle-icon');
+
+        function toggleReviews() {
+            if (window.innerWidth < 768 && reviewsContent && reviewsToggleIcon) {
+                reviewsContent.classList.toggle('expanded');
+                
+                // Меняем иконку
+                if (reviewsContent.classList.contains('expanded')) {
+                    reviewsToggleIcon.textContent = '▼';
+                } else {
+                    reviewsToggleIcon.textContent = '▶';
+                }
+            }
+        }
+
+        // Инициализация состояния на мобильных
+        function initReviewsState() {
+            if (reviewsContent && reviewsToggleIcon) {
+                if (window.innerWidth < 768) {
+                    reviewsContent.classList.remove('expanded');
+                    reviewsToggleIcon.textContent = '▶';
+                } else {
+                    reviewsContent.classList.add('expanded');
+                    reviewsToggleIcon.textContent = '▼';
+                }
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            initReviewsState();
+            if (reviewsTitle) {
+                reviewsTitle.addEventListener('click', toggleReviews);
+            }
+        });
+
+        // Обработка изменения размера окна
+        window.addEventListener('resize', () => {
+            initReviewsState();
         });
 
     </script>
