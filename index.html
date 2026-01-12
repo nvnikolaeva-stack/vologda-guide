@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деревянная Вологда | Там, где резной палисад</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Yeseva+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #FDFBF7;
+            --bg-card: #E8DFD0;
+            --accent: #4A6B8A;
+            --heading: #2C3E50;
+            --hover: #B87333;
+            --text: #3D3D3D;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text);
+            background-color: var(--bg-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-family: 'Yeseva One', serif;
+            color: var(--heading);
+        }
+
+        h2, h3 {
+            font-family: 'Yeseva One', serif;
+            color: var(--heading);
+            font-weight: 300;
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-main, #FDFBF7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-content {
+            text-align: center;
+            max-width: 320px;
+            padding: 0 1rem;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--bg-card, #E8DFD0);
+            border-top-color: var(--hover, #B87333);
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            color: var(--accent, #4A6B8A);
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeText 0.5s ease;
+        }
+
+        @keyframes fadeText {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(253, 251, 247, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            padding: 1rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Yeseva One', serif;
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--heading);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--hover);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--hover);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        nav a.active {
+            color: var(--hover);
+        }
+
+        nav a.active::after {
+            width: 100%;
+        }
+
+        .burger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+        }
+
+        .burger span {
+            width: 25px;
+            height: 3px;
+            background: var(--heading);
+            transition: all 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 70vh;
+            background: linear-gradient(rgba(44, 62, 80, 0.4), rgba(44, 62, 80, 0.4)),
+                        url('images/fon1') center/cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            margin-top: 70px;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: none;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            text-shadow: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 107, 138, 0.3);
+        }
+
+        .btn:hover {
+            background: var(--hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 115, 51, 0.4);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--hover), transparent);
+        }
+
+        /* Route Section */
+        .route-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        #map {
+            height: 500px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-list {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 1rem;
+        }
+
+        .route-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .route-list::-webkit-scrollbar-track {
+            background: var(--bg-card);
+            border-radius: 10px;
+        }
+
+        .route-list::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .route-item {
+            background: var(--bg-card);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .route-item:hover {
+            transform: translateX(5px);
+            border-left-color: var(--hover);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .route-item.active {
+            border-left-color: var(--accent);
+            background: #D4C5B0;
+        }
+
+        .route-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .route-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .route-item p {
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text);
+        }
+
+        /* Заголовок карточки */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+        }
+
+        .card-toggle {
+            display: none;
+            font-size: 1rem;
+            color: var(--accent);
+            transition: transform 0.3s ease;
+        }
+
+        .card-toggle.rotated {
+            transform: rotate(180deg);
+        }
+
+        .card-details {
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* About Section */
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .about-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--heading);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--hover);
+        }
+
+        .project-info {
+            font-size: 0.9rem;
+            font-style: italic;
+            margin-top: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Scroll to Top Button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(74, 107, 138, 0.3);
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .scroll-top:hover {
+            background: var(--hover);
+            transform: translateY(-5px);
+        }
+
+        .scroll-top.visible {
+            display: flex;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Decorative Lace Pattern */
+        .lace-pattern {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(184, 115, 51, 0.1) 10px,
+                rgba(184, 115, 51, 0.1) 20px
+            );
+            opacity: 0.3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            nav ul {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: var(--bg-main);
+                flex-direction: column;
+                padding: 2rem;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            nav ul.active {
+                left: 0;
+            }
+
+            .burger {
+                display: flex;
+            }
+
+            .burger.active span:nth-child(1) {
+                transform: rotate(45deg) translate(8px, 8px);
+            }
+
+            .burger.active span:nth-child(2) {
+                opacity: 0;
+            }
+
+            .burger.active span:nth-child(3) {
+                transform: rotate(-45deg) translate(7px, -7px);
+            }
+
+            .hero {
+                height: 80vh;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .route-container {
+                grid-template-columns: 1fr;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 80vh;
+            }
+
+            /* Отступы секций */
+            section {
+                padding: 2rem 1rem;
+            }
+
+            /* Заголовки секций */
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+            }
+
+            /* Декоративная линия под заголовком */
+            .section-title::after {
+                margin-top: 0.5rem;
+            }
+
+            /* Сетка карточек */
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                margin-top: 1rem;
+            }
+
+            /* Специфичные секции */
+            #attractions,
+            #cafes,
+            #hotels {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+
+            /* Компактные карточки на мобильных */
+            .card {
+                border-radius: 10px;
+            }
+
+            .card img {
+                border-radius: 10px 10px 0 0;
+            }
+
+            .card-content {
+                padding: 0.8rem 1rem;
+            }
+
+            .card-content h3,
+            .card-header h3 {
+                font-size: 1rem;
+                font-weight: 500;
+                line-height: 1.3;
+                margin: 0;
+            }
+
+            .card-header {
+                cursor: pointer;
+                padding: 0;
+                margin-bottom: 0;
+                gap: 0.5rem;
+            }
+            
+            .card-header:active {
+                opacity: 0.7;
+            }
+            
+            .card-toggle {
+                display: block;
+                font-size: 0.8rem;
+                flex-shrink: 0;
+            }
+            
+            .card-details {
+                max-height: 0;
+                opacity: 0;
+                margin-top: 0;
+            }
+            
+            .card-details.expanded {
+                max-height: 500px;
+                opacity: 1;
+                margin-top: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                height: 70vh;
+                margin-top: 60px;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+                line-height: 1.2;
+            }
+
+            .hero p {
+                font-size: 1rem;
+                padding: 0 1rem;
+            }
+
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+
+            section {
+                padding: 2rem 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .route-item img {
+                height: 120px;
+            }
+
+            .route-item h3 {
+                font-size: 1rem;
+            }
+
+            .route-item p {
+                font-size: 0.85rem;
+            }
+
+            .card-content h3 {
+                font-size: 1.1rem;
+            }
+
+            .card-content p {
+                font-size: 0.9rem;
+            }
+
+            #map {
+                height: 300px;
+            }
+
+            .about-content {
+                font-size: 1rem;
+                text-align: left;
+            }
+
+            footer {
+                padding: 2rem 1rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+
+        /* Десктоп — всегда раскрыто */
+        @media (min-width: 769px) {
+            /* Десктоп — карточки всегда раскрыты */
+            .card-details {
+                max-height: none !important;
+                opacity: 1 !important;
+                margin-top: 0.8rem !important;
+            }
+            
+            .card-toggle {
+                display: none !important;
+            }
+            
+            .card-header {
+                cursor: default;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div id="loader" class="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Загрузка...</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Деревянная Вологда</a>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="#route">Маршрут</a></li>
+                    <li><a href="#attractions">Достопримечательности</a></li>
+                    <li><a href="#cafes">Кафе</a></li>
+                    <li><a href="#hotels">Где остановиться</a></li>
+                    <li><a href="#about">О Вологде</a></li>
+                </ul>
+            </nav>
+            <div class="burger" id="burger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Там, где резной палисад</h1>
+            <p>Пешеходный маршрут по памятникам деревянного зодчества</p>
+            <a href="#route" class="btn">Начать маршрут</a>
+        </div>
+    </section>
+
+    <!-- Route Section -->
+    <section id="route" class="fade-in">
+        <h2 class="section-title">Маршрут по деревянной Вологде</h2>
+        <p style="max-width: 800px; margin: 0 auto 2rem; text-align: center; font-size: 1.1rem; line-height: 1.8;">Маршрут проходит по историческому центру Вологды. Вы увидите купеческие особняки XVIII-XIX веков с резными наличниками, ажурными карнизами и знаменитыми палисадами. Протяжённость — 3 км, время прогулки — 2-3 часа. Дома можно осматривать снаружи бесплатно в любое время.</p>
+        <div class="route-container">
+            <div id="map"></div>
+            <div class="route-list">
+                <div class="route-item" data-lat="59.2250" data-lng="39.8800" data-address="ул. Октябрьская, 18" data-id="1">
+                    <img src="images/dom-nemirova.jpeg" alt="Дом Немирова">
+                    <h3>1. Дом Немирова</h3>
+                    <p>Дом с богатым резным декором. Наличники украшены «солярными» символами — стилизованными изображениями солнца.</p>
+                </div>
+                <div class="route-item" data-lat="59.2230" data-lng="39.8870" data-address="ул. Благовещенская, 20" data-id="2">
+                    <img src="images/dom-butyrinoi.jpeg" alt="Дом Бутыриной">
+                    <h3>2. Дом Бутыриной</h3>
+                    <p>Дом середины XIX века с ажурными наличниками, напоминающими кружево. Один из самых фотогеничных объектов маршрута.</p>
+                </div>
+                <div class="route-item" data-lat="59.2232" data-lng="39.8872" data-address="ул. Благовещенская, 22" data-id="3">
+                    <img src="images/dom-izvozchikova.jpeg" alt="Дом Извощикова">
+                    <h3>3. Дом Извощикова</h3>
+                    <p>Дом извозчика — представителя среднего городского сословия. Резьба скромнее, чем у купцов, но выполнена мастерски.</p>
+                </div>
+                <div class="route-item" data-lat="59.2225" data-lng="39.8835" data-address="ул. Ленинградская, 12" data-id="4">
+                    <img src="images/dom-zasetskiy.jpeg" alt="Дом Засецких">
+                    <h3>4. Дом Засецких</h3>
+                    <p>Старейший деревянный дом Вологды, 1790-е годы. Классический стиль с элементами барокко. Дом принадлежал дворянам Засецким — одной из древнейших вологодских фамилий.</p>
+                </div>
+                <div class="route-item" data-lat="59.2215" data-lng="39.8875" data-address="ул. Герцена, 21" data-id="5">
+                    <img src="images/dom-naumova.png" alt="Дом Наумова">
+                    <h3>5. Дом Наумова</h3>
+                    <p>Двухэтажный дом с мезонином. Отличительная черта — резной фриз под карнизом с повторяющимся геометрическим узором.</p>
+                </div>
+                <div class="route-item" data-lat="59.2208" data-lng="39.8882" data-address="ул. Герцена, 35" data-id="6">
+                    <img src="images/dom-Levin-Vatagins.jpeg" alt="Дом Левина-Ватагина">
+                    <h3>6. Дом Левина-Ватагина</h3>
+                    <p>Построен в середине XIX века. Двухэтажный особняк с мезонином и богатой резьбой. Наличники украшены растительным орнаментом.</p>
+                </div>
+                <div class="route-item" data-lat="59.2209" data-lng="39.8885" data-address="ул. Герцена, 37" data-id="7">
+                    <img src="images/dom-Druzhinina.jpeg" alt="Флигель дома Дружинина">
+                    <h3>7. Флигель дома Дружинина</h3>
+                    <p>Небольшой флигель при купеческой усадьбе. Демонстрирует «вологодский стиль» резьбы: геометрические узоры в сочетании с растительными мотивами.</p>
+                </div>
+                <div class="route-item" data-lat="59.2210" data-lng="39.8900" data-address="ул. Засодимского, 5" data-id="8">
+                    <img src="images/dom-byrlovih.jpeg" alt="Дом Бурлова">
+                    <h3>8. Дом Бурлова</h3>
+                    <p>Купеческий дом конца XIX века. Характерная черта — высокий цоколь и резные подзоры под крышей. Сохранился оригинальный палисад.</p>
+                </div>
+                <div class="route-item" data-lat="59.2212" data-lng="39.8910" data-address="ул. Засодимского, 14" data-id="9">
+                    <img src="images/dom-vorobieva.jpeg" alt="Дом Воробьева">
+                    <h3>9. Дом Воробьёва</h3>
+                    <p>Типичный городской дом мещанина. Простая, но изящная резьба. Сохранился деревянный забор с традиционными балясинами.</p>
+                </div>
+                <div class="route-item" data-lat="59.2195" data-lng="39.8850" data-address="ул. Советский проспект, 16" data-id="10">
+                    <img src="images/dom-popova.jpeg" alt="Дом купца Попова">
+                    <h3>10. Дом купца Попова</h3>
+                    <p>Богатый купеческий особняк 1860-х годов. Резьба на наличниках выполнена в технике «глухой резьбы» — без сквозных отверстий.</p>
+                </div>
+                <div class="route-item" data-lat="59.2192" data-lng="39.8855" data-address="ул. Советский проспект, 20" data-id="11">
+                    <img src="images/dom-sokovikova.jpeg" alt="Дом Соковикова">
+                    <h3>11. Дом Соковикова</h3>
+                    <p>Дом с угловым расположением. Резьба выполнена в «барочном» стиле с завитками и растительными элементами.</p>
+                </div>
+                <div class="route-item" data-lat="59.2190" data-lng="39.8860" data-address="ул. Советский проспект, 22" data-id="12">
+                    <img src="images/dom-samariva.jpeg" alt="Дом купца Самарина">
+                    <h3>12. Дом купца Самарина</h3>
+                    <p>Выставочный комплекс. Внутри работает экспозиция о деревянном зодчестве Вологды. Вход: 150 рублей. Время работы: 10:00-17:00, выходной — понедельник.</p>
+                </div>
+                <div class="route-item" data-lat="59.2180" data-lng="39.8920" data-address="ул. Чернышевского, 53" data-id="13">
+                    <img src="images/dom-karaulova.jpeg" alt="Дом Караулова">
+                    <h3>13. Дом Караулова</h3>
+                    <p>Дом чиновника конца XIX века. Скромная, но качественная резьба. Хорошо сохранился балкон с точёными балясинами.</p>
+                </div>
+                <div class="route-item" data-lat="59.2182" data-lng="39.8922" data-address="ул. Чернышевского, 55" data-id="14">
+                    <img src="images/dom-chernoglazova.jpeg" alt="Дом Черноглазова">
+                    <h3>14. Дом Черноглазова</h3>
+                    <p>Купеческий дом с характерным для Вологды сочетанием: пропильная резьба на наличниках и глухая — на подзорах.</p>
+                </div>
+                <div class="route-item" data-lat="59.2178" data-lng="39.8925" data-address="ул. Чернышевского, 57" data-id="15">
+                    <img src="images/dom-alaeva.jpeg" alt="Дом Алаева">
+                    <h3>15. Дом Алаева</h3>
+                    <p>Небольшой одноэтажный дом с традиционным вологодским палисадом — невысоким резным забором перед окнами.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Attractions Section -->
+    <section id="attractions" class="fade-in">
+        <h2 class="section-title">Что ещё посмотреть в Вологде</h2>
+        <div class="cards-grid">
+            <div class="card">
+                <img src="images/kreml.jpeg" alt="Вологодский кремль">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Вологодский кремль</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Архиерейский двор XVI-XVII веков с крепостными стенами, башнями и палатами. Здесь расположен главный музей города.</p>
+                        <p class="address">Адрес: ул. Сергея Орлова, 15</p>
+                        <p class="price">Вход: 200 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/sofiski-sobor.jpeg" alt="Софийский собор">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Софийский собор</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Главный храм Вологды, построен в 1568-1570 годах по указу Ивана Грозного. Сохранились фрески XVII века. Летом можно подняться на колокольню.</p>
+                        <p class="address">Адрес: Кремлёвская площадь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/muzei-kruzheva.jpeg" alt="Музей кружева">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Музей кружева</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Крупнейшая в мире коллекция кружева — более 700 экспонатов. Можно увидеть работы вологодских мастериц XIX-XXI веков.</p>
+                        <p class="address">Адрес: Кремлёвская площадь, 12</p>
+                        <p class="price">Вход: 250 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/muzei-petr1.jpeg" alt="Дом-музей Петра I">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Дом-музей Петра I</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Дом голландского купца, где останавливался Пётр I во время визитов в Вологду. Экспозиция о петровской эпохе.</p>
+                        <p class="address">Адрес: Советский проспект, 47</p>
+                        <p class="price">Вход: 150 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/spaso-prilutskiy.jpeg" alt="Спасо-Прилуцкий монастырь">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Спасо-Прилуцкий монастырь</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Действующий мужской монастырь XIV века в 5 км от центра. Один из древнейших на Русском Севере.</p>
+                        <p class="price">Вход свободный</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/naberezhnaya.jpeg" alt="Набережная реки Вологды">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Набережная реки Вологды</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Пешеходная зона вдоль реки с видом на исторический центр. Здесь установлены скамейки, памятники и арт-объекты. Хорошее место для отдыха после маршрута.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cafes Section -->
+    <section id="cafes" class="fade-in">
+        <h2 class="section-title">Кафе и рестораны</h2>
+        <div class="cards-grid">
+            <div class="card">
+                <img src="images/restoran-rodnoe.jpeg" alt="Кафе Родное">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Кафе «Родное»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Северная кухня из местных фермерских продуктов. Каша из полбы, кулебяка с рыжиками, овсяный кисель — попробуйте Вологду на вкус.</p>
+                        <p class="address">Адрес: ул. Благовещенская, 20</p>
+                        <p class="price">Средний чек: 800 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/restoran-parovozov.jpeg" alt="Ресторан Паровозовъ">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Ресторан «Паровозовъ»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Семейный ресторан в железнодорожной эстетике: проводники, подстаканники, тёплая атмосфера для долгого ужина с друзьями.</p>
+                        <p class="address">Адрес: Ленинградская, 97Б</p>
+                        <p class="price">Средний чек: 1000 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/restoran-marussia.jpeg" alt="Ресторан Маруся">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Ресторан «Маруся»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Камерный ресторан при бутик-отеле. Интерьер в духе Русского Севера, акцент на локальные рецепты и сезонные продукты.</p>
+                        <p class="address">Адрес: ул. Лермонтова, 29</p>
+                        <p class="price">Средний чек: 1500 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/restoran-1791.jpeg" alt="DOME 1791">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>DOME 1791</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Ресторан европейской кухни для особых случаев. Красивая подача, два этажа стильного интерьера, коктейльная карта.</p>
+                        <p class="address">Адрес: ул. Мира, 9</p>
+                        <p class="price">Средний чек: 1500 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/restoran-pizzafabrika.jpeg" alt="ПиццаФабрика">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>ПиццаФабрика</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Большой семейный ресторан: пицца, паста, салаты. Детская комната с аниматорами. Понятно, вкусно, без сюрпризов.</p>
+                        <p class="address">Адрес: ул. Зосимовская, 47</p>
+                        <p class="price">Средний чек: 600 ₽</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/restoran-larossarossa.jpeg" alt="La Rosa Rossa">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>La Rosa Rossa</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Итальянский ресторан для неспешного вечера. Паста, морепродукты, стейки. Живая музыка по выходным.</p>
+                        <p class="address">Адрес: ул. Лермонтова, 4</p>
+                        <p class="price">Средний чек: 1200 ₽</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hotels Section -->
+    <section id="hotels" class="fade-in">
+        <h2 class="section-title">Где остановиться</h2>
+        <div class="cards-grid">
+            <div class="card">
+                <img src="images/hotel-biblioteka.webp" alt="Бутик-отель Библиотека">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Бутик-отель «Библиотека»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Дизайнерский камерный отель, где каждый номер оформлен как отдельная книга. Уютная атмосфера для ценителей искусства и литературы.</p>
+                        <p class="address">Адрес: ул. Чернышевского, 24</p>
+                        <p class="price">От 4500 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/hotel-marussia.jpeg" alt="Бутик-отель Маруся">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Бутик-отель «Маруся»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Проживание в деревянном доме начала XX века. Отреставрированные детали, много натурального дерева — настоящее погружение в старую Вологду.</p>
+                        <p class="address">Адрес: ул. Лермонтова, 29</p>
+                        <p class="price">От 5500 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/hotel-volgodom.jpeg" alt="VologDom">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>VologDom</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Апартаменты на набережной — как своя квартира в центре. Рядом музеи, прогулочные зоны и всё для самостоятельного отдыха.</p>
+                        <p class="address">Адрес: Набережная 6-й Армии</p>
+                        <p class="price">От 3000 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/hotel-svetlitsa.jpeg" alt="Отель Светлица">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Отель «Светлица»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Спокойный уютный отель в исторической части. Подойдёт тем, кто ценит тишину, пешие прогулки и простой комфорт без пафоса.</p>
+                        <p class="address">Адрес: наб. 6-й Армии, 123а</p>
+                        <p class="price">От 3500 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/hotel-atrium.jpeg" alt="Гостиница Атриум">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>Гостиница «Атриум»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Практичный вариант в самом центре. Большой номерной фонд, завтраки включены. Удобно и для туристов, и для командировок.</p>
+                        <p class="address">Адрес: ул. Герцена, 27</p>
+                        <p class="price">От 3000 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <img src="images/hotel-spasskiy.jpeg" alt="ГРК Спасский">
+                <div class="card-content">
+                    <div class="card-header" onclick="toggleCardDetails(this)">
+                        <h3>ГРК «Спасский»</h3>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-details">
+                        <p class="description">Отель «всё рядом»: исторический центр в шаговой доступности, дополнительные сервисы на месте. Для тех, кто хочет жить в комплексе.</p>
+                        <p class="address">Адрес: ул. Октябрьская, 25</p>
+                        <p class="price">От 2800 ₽/ночь</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="fade-in">
+        <h2 class="section-title">О Вологде</h2>
+        <div class="about-content">
+            <p>Вологда основана в 1147 году — ровеснице Москвы. Город сохранил более 100 памятников деревянного зодчества XVIII-XIX веков — это самая большая коллекция деревянной архитектуры в России.</p>
+            <p>Знаменитый «вологодский стиль» — это резные наличники с растительными и солярными орнаментами, ажурные подзоры под крышами и палисады — невысокие резные заборчики перед окнами. Именно о них песня «Вологда» группы «Песняры»: «Где резной палисад».</p>
+            <p>Лучшее время для поездки — май-сентябрь, когда деревянные дома утопают в зелени. Зимой город тоже красив, особенно в новогодние праздники.</p>
+            <p>Как добраться: поезд из Москвы — 8 часов, из Санкт-Петербурга — 10 часов. На машине по трассе М8 из Москвы — 450 км.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Деревянная Вологда</h3>
+            <p>Там, где резной палисад</p>
+            <div class="footer-links">
+                <a href="#route">Маршрут</a>
+                <a href="#attractions">Достопримечательности</a>
+                <a href="#cafes">Кафе</a>
+                <a href="#hotels">Где остановиться</a>
+                <a href="#about">О Вологде</a>
+            </div>
+            <p class="project-info">Школьный проект Николаевой Марии</p>
+            <p>&copy; 2025 Деревянная Вологда. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <!-- Scroll to Top Button -->
+    <button class="scroll-top" id="scrollTop" aria-label="Наверх">↑</button>
+
+    <script>
+        // Анимированные надписи загрузки
+        const loadingMessages = [
+            "Подгружаем адреса, карты и полезные точки",
+            "Прокладываем путь до лучших видов и набережной",
+            "Взбиваем вологодское масло",
+            "Плетём кружево из страниц — почти готово",
+            "О-о-о, загружаемся... так и надо, мы же в Вологде",
+            "Готовим маршрут по деревянной Вологде",
+            "Разворачиваем северную красоту"
+        ];
+
+        let messageIndex = 0;
+        let messageInterval;
+
+        function rotateLoadingMessage() {
+            const loaderText = document.querySelector('.loader-text');
+            if (!loaderText) return;
+            
+            // Плавное исчезновение
+            loaderText.style.opacity = '0';
+            loaderText.style.transform = 'translateY(-10px)';
+            
+            setTimeout(() => {
+                messageIndex = (messageIndex + 1) % loadingMessages.length;
+                loaderText.textContent = loadingMessages[messageIndex];
+                
+                // Плавное появление
+                loaderText.style.opacity = '1';
+                loaderText.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        function startLoadingAnimation() {
+            const loaderText = document.querySelector('.loader-text');
+            if (loaderText) {
+                // Случайная первая надпись
+                messageIndex = Math.floor(Math.random() * loadingMessages.length);
+                loaderText.textContent = loadingMessages[messageIndex];
+                loaderText.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                
+                // Меняем надпись каждые 2 секунды
+                messageInterval = setInterval(rotateLoadingMessage, 2000);
+            }
+        }
+
+        function hideLoader() {
+            const loader = document.getElementById('loader');
+            if (loader) {
+                clearInterval(messageInterval);
+                loader.classList.add('hidden');
+                
+                // Удаляем из DOM после анимации
+                setTimeout(() => {
+                    loader.remove();
+                }, 500);
+            }
+        }
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', () => {
+            startLoadingAnimation();
+        });
+
+        // Скрываем loader когда страница загружена
+        window.addEventListener('load', () => {
+            // Минимум 2 секунды показываем loader
+            setTimeout(hideLoader, 2000);
+        });
+
+        // Mobile Menu
+        const burger = document.getElementById('burger');
+        const navMenu = document.getElementById('nav-menu');
+
+        burger.addEventListener('click', () => {
+            burger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu on link click
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                burger.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to Top Button
+        const scrollTopBtn = document.getElementById('scrollTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Fade In Animation on Scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Map Initialization
+        const map = L.map('map').setView([59.2210, 39.8880], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Route Points
+        const routeItems = document.querySelectorAll('.route-item');
+        const markers = [];
+        const popups = [];
+
+        routeItems.forEach((item, index) => {
+            const lat = parseFloat(item.dataset.lat);
+            const lng = parseFloat(item.dataset.lng);
+            const address = item.dataset.address || '';
+            const id = item.dataset.id;
+            const title = item.querySelector('h3').textContent;
+
+            const marker = L.marker([lat, lng]).addTo(map);
+            const popupContent = `<strong>${title}</strong>${address ? '<br><small>' + address + '</small>' : ''}`;
+            const popup = L.popup().setContent(popupContent);
+            marker.bindPopup(popup);
+            
+            markers.push(marker);
+            popups.push(popup);
+
+            // Click on route item
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                routeItems.forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Open popup and center map
+                map.setView([lat, lng], 15);
+                marker.openPopup();
+            });
+
+            // Click on marker
+            marker.on('click', () => {
+                routeItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        });
+
+        // Координаты маршрута в правильном порядке
+        const routeCoordinates = [
+            [59.2250, 39.8800], // 1. Дом Немирова
+            [59.2230, 39.8870], // 2. Дом Бутыриной
+            [59.2232, 39.8872], // 3. Дом Извощикова
+            [59.2225, 39.8835], // 4. Дом Засецких
+            [59.2215, 39.8875], // 5. Дом Наумова
+            [59.2208, 39.8882], // 6. Дом Левина-Ватагина
+            [59.2209, 39.8885], // 7. Флигель дома Дружинина
+            [59.2210, 39.8900], // 8. Дом Бурлова
+            [59.2212, 39.8910], // 9. Дом Воробьёва
+            [59.2195, 39.8850], // 10. Дом купца Попова
+            [59.2192, 39.8855], // 11. Дом Соковикова
+            [59.2190, 39.8860], // 12. Дом купца Самарина
+            [59.2180, 39.8920], // 13. Дом Караулова
+            [59.2182, 39.8922], // 14. Дом Черноглазова
+            [59.2178, 39.8925]  // 15. Дом Алаева
+        ];
+
+        // Рисуем линию маршрута
+        const routeLine = L.polyline(routeCoordinates, {
+            color: '#B87333',      // Терракотовый цвет
+            weight: 3,             // Толщина линии
+            opacity: 0.8,          // Прозрачность
+            dashArray: '10, 10'    // Пунктирная линия
+        }).addTo(map);
+
+        // Подсветка активного пункта меню при скролле
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('nav a[href^="#"]');
+
+        function highlightNavOnScroll() {
+            const scrollPosition = window.scrollY + 100; // Отступ сверху для учёта шапки
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === '#' + sectionId) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+            
+            // Если пользователь в самом верху страницы — убираем все активные состояния
+            if (window.scrollY < 300) {
+                navLinks.forEach(link => link.classList.remove('active'));
+            }
+        }
+
+        window.addEventListener('scroll', highlightNavOnScroll);
+
+        // Сворачивание описаний в карточках
+        function toggleCardDetails(header) {
+            if (window.innerWidth > 768) return;
+            
+            const details = header.nextElementSibling;
+            const toggle = header.querySelector('.card-toggle');
+            
+            details.classList.toggle('expanded');
+            toggle.classList.toggle('rotated');
+        }
+
+        // При изменении размера окна для карточек
+        window.addEventListener('resize', () => {
+            const allDetails = document.querySelectorAll('.card-details');
+            const allToggles = document.querySelectorAll('.card-toggle');
+            
+            if (window.innerWidth > 768) {
+                allDetails.forEach(el => el.classList.add('expanded'));
+            } else {
+                allDetails.forEach(el => el.classList.remove('expanded'));
+                allToggles.forEach(el => el.classList.remove('rotated'));
+            }
+        });
+
+    </script>
+</body>
+</html>
+
