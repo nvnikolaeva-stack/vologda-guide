@@ -425,11 +425,20 @@
             padding: 5rem 2rem;
         }
 
-        .reviews-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-top: 3rem;
+        .carousel-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 3rem auto 0;
+        }
+
+        .carousel-wrapper {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease;
         }
 
         .review-card {
@@ -439,6 +448,13 @@
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             position: relative;
+            flex: 0 0 calc(33.333% - 1.33rem);
+            min-width: 0;
+            margin-right: 2rem;
+        }
+
+        .review-card:last-child {
+            margin-right: 0;
         }
 
         .review-card:hover {
@@ -485,35 +501,86 @@
         }
 
         /* Сворачиваемый блок отзывов */
-        .reviews-title {
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: all 0.3s ease;
+            line-height: 1;
+            padding: 0;
+        }
+
+        .carousel-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-btn-prev {
+            left: -20px;
+        }
+
+        .carousel-btn-next {
+            right: -20px;
+        }
+
+        .carousel-dots {
             display: flex;
             justify-content: center;
-            align-items: center;
             gap: 0.5rem;
-            cursor: default;
+            margin-top: 2rem;
         }
 
-        .reviews-toggle-icon {
-            display: none;
-            font-size: 1rem;
-            color: var(--accent);
-            transition: transform 0.3s ease;
+        .carousel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(184, 115, 51, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
         }
 
-        .reviews-content {
-            overflow: hidden;
-            transition: max-height 0.4s ease, opacity 0.4s ease;
+        .carousel-dot.active {
+            background: var(--accent);
+            width: 12px;
+            height: 12px;
         }
 
-        /* На десктопе блок всегда развёрнут */
-        @media (min-width: 768px) {
-            .reviews-content {
-                max-height: none !important;
-                opacity: 1 !important;
+        .carousel-dot:hover {
+            background: var(--hover);
+        }
+
+        /* Адаптивность карусели */
+        @media (min-width: 1024px) {
+            .review-card {
+                flex: 0 0 calc(33.333% - 1.33rem);
             }
+        }
 
-            .reviews-title {
-                cursor: default;
+        @media (max-width: 1023px) and (min-width: 768px) {
+            .review-card {
+                flex: 0 0 calc(50% - 1rem);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .review-card {
+                flex: 0 0 100%;
+                margin-right: 0;
             }
         }
 
@@ -678,8 +745,16 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
-            .reviews-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .review-card {
+                flex: 0 0 calc(50% - 1rem);
+            }
+
+            .carousel-btn-prev {
+                left: -15px;
+            }
+
+            .carousel-btn-next {
+                right: -15px;
             }
 
             .section-title {
@@ -779,33 +854,27 @@
                 padding: 2rem 1rem;
             }
 
-            .reviews-title {
-                cursor: pointer;
-                user-select: none;
-            }
-
-            .reviews-toggle-icon {
-                display: block;
-            }
-
-            .reviews-content {
-                max-height: 0;
-                opacity: 0;
-            }
-
-            .reviews-content.expanded {
-                max-height: 5000px;
-                opacity: 1;
-            }
-
-            .reviews-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
+            .carousel-container {
                 margin-top: 1.5rem;
             }
 
             .review-card {
+                flex: 0 0 100%;
                 padding: 1.2rem;
+            }
+
+            .carousel-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 1.5rem;
+            }
+
+            .carousel-btn-prev {
+                left: 5px;
+            }
+
+            .carousel-btn-next {
+                right: 5px;
             }
 
             .review-avatar {
@@ -1321,55 +1390,106 @@
 
     <!-- Reviews Section -->
     <section id="reviews" class="fade-in reviews-section">
-        <h2 class="section-title reviews-title" id="reviews-title">
-            <span>💬 Отзывы</span>
-            <span class="reviews-toggle-icon">▼</span>
-        </h2>
-        <div class="reviews-content">
-            <div class="reviews-grid">
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">А</div>
-                    <h3 class="review-author">Аня</h3>
+        <h2 class="section-title">💬 Отзывы</h2>
+        <div class="carousel-container">
+            <button class="carousel-btn carousel-btn-prev" aria-label="Предыдущий отзыв">‹</button>
+            <div class="carousel-wrapper">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">А</div>
+                            <h3 class="review-author">Аня</h3>
+                        </div>
+                        <p class="review-text">Мы ехали в Вологду на выходные, и этот сайт реально спас. Я просто открыла маршрут и тыкала по точкам — сразу видно, куда идти. Карта удобная, ничего не надо гуглить отдельно. И фотки помогли понять, что мы вообще ищем.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">К</div>
+                            <h3 class="review-author">Кира</h3>
+                        </div>
+                        <p class="review-text">Сайт классный, прям вайб. Не как скучный путеводитель, а как "пойдём, покажу места". Мы с подругой прошли маршрут за пару часов, по дороге фоткались у домов. Понравилось, что всё коротко и по делу, без километров текста.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">М</div>
+                            <h3 class="review-author">Миша</h3>
+                        </div>
+                        <p class="review-text">Я обычно не люблю планировать, но тут всё просто: открыл, нажал — пошёл. Удобно, что есть точки на карте и можно быстро понять, где ты находишься. Мы не потерялись ни разу. В итоге прошли почти всё и нормально уложились по времени.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">Л</div>
+                            <h3 class="review-author">Лена</h3>
+                        </div>
+                        <p class="review-text">Мне понравилось, что сайт помогает смотреть на город внимательнее. Я раньше мимо таких домов проходила и не замечала. А тут читаешь короткое описание — и начинаешь реально рассматривать окна, резьбу, детали. В итоге прогулка стала не просто "погуляли", а прям маленькое путешествие.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">О</div>
+                            <h3 class="review-author">Ольга</h3>
+                        </div>
+                        <p class="review-text">Ездили с друзьями, и было важно, чтобы всё работало на телефоне. Сайт грузится быстро, маршрут понятный, адреса не надо переписывать. Понравилось, что можно планировать день: сначала прогулка, потом кафе, потом музей. Очень удобно, особенно если в городе впервые.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">С</div>
+                            <h3 class="review-author">Сергей</h3>
+                        </div>
+                        <p class="review-text">Хороший, аккуратный сайт. Ничего лишнего — открыл и пошёл по маршруту. Удобно, что всё собрано в одном месте: куда сходить, где поесть, где остановиться. Мы были компанией, и сайт помог быстро решить "что делаем сегодня", без долгих поисков.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">М</div>
+                            <h3 class="review-author">Мария</h3>
+                        </div>
+                        <p class="review-text">Путешествие продумано идеально, сайт красиво и, самое главное, удобно оформлен - все просто и понятно. Понравилось, что можно пользоваться картой, на которой отмечены самые интересные места города, и даже можно прочитать краткую информацию про саму Вологду и как до нее добраться. Полезный сайт, спасибо!</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">А</div>
+                            <h3 class="review-author">Анна</h3>
+                        </div>
+                        <p class="review-text">Отличный, очень удобный сайт! Собрана вся необходимая информация для путешественника, все очень доступно, наглядно и просто в использовании. Очень легко планировать поездку, пользуясь этим сайтом</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">С</div>
+                            <h3 class="review-author">Светлана</h3>
+                        </div>
+                        <p class="review-text">Никогда не была в Вологде, но посмотрев этот сайт очень захотелось туда поехать и посетить все достопримечательности. Отличный гид, полезная информация, даже карта есть! Спасибо разработчикам сайта!</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">Б</div>
+                            <h3 class="review-author">Белла</h3>
+                        </div>
+                        <p class="review-text">Очень полезный, удобный сайт! Доступно и понятно для человека, который ни разу не был в Вологде. В планах появилась новая поездка. Спасибо за информацию, Белла.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">О</div>
+                            <h3 class="review-author">Ольга</h3>
+                        </div>
+                        <p class="review-text">Мне очень понравилась идея. Готовый план на день, то чего мне всегда не хватает, т.к. сама планировать маршруты по городу не очень люблю. Единственное, что для меня оказалось неудобно, это использование карты. Если бы маршрут можно было бы открыть в яндекс или гугл картах, был бы вообще кайф.</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">К</div>
+                            <h3 class="review-author">Ксения</h3>
+                        </div>
+                        <p class="review-text">Сайт пушка! Все структурировано, четко, понятно, без лишней воды. МОЛОДЦЫ!!!!!</p>
+                    </div>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-avatar">Д</div>
+                            <h3 class="review-author">Дарья</h3>
+                        </div>
+                        <p class="review-text">Пробежалась по сайту. Сайт простой и приятный глазу, классные фразы при загрузке сайта, удобная задумка с маршрутом на карте сразу.</p>
+                    </div>
                 </div>
-                <p class="review-text">Мы ехали в Вологду на выходные, и этот сайт реально спас. Я просто открыла маршрут и тыкала по точкам — сразу видно, куда идти. Карта удобная, ничего не надо гуглить отдельно. И фотки помогли понять, что мы вообще ищем.</p>
             </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">К</div>
-                    <h3 class="review-author">Кира</h3>
-                </div>
-                <p class="review-text">Сайт классный, прям вайб. Не как скучный путеводитель, а как "пойдём, покажу места". Мы с подругой прошли маршрут за пару часов, по дороге фоткались у домов. Понравилось, что всё коротко и по делу, без километров текста.</p>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">М</div>
-                    <h3 class="review-author">Миша</h3>
-                </div>
-                <p class="review-text">Я обычно не люблю планировать, но тут всё просто: открыл, нажал — пошёл. Удобно, что есть точки на карте и можно быстро понять, где ты находишься. Мы не потерялись ни разу. В итоге прошли почти всё и нормально уложились по времени.</p>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">Л</div>
-                    <h3 class="review-author">Лена</h3>
-                </div>
-                <p class="review-text">Мне понравилось, что сайт помогает смотреть на город внимательнее. Я раньше мимо таких домов проходила и не замечала. А тут читаешь короткое описание — и начинаешь реально рассматривать окна, резьбу, детали. В итоге прогулка стала не просто "погуляли", а прям маленькое путешествие.</p>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">О</div>
-                    <h3 class="review-author">Ольга</h3>
-                </div>
-                <p class="review-text">Ездили с друзьями, и было важно, чтобы всё работало на телефоне. Сайт грузится быстро, маршрут понятный, адреса не надо переписывать. Понравилось, что можно планировать день: сначала прогулка, потом кафе, потом музей. Очень удобно, особенно если в городе впервые.</p>
-            </div>
-            <div class="review-card">
-                <div class="review-header">
-                    <div class="review-avatar">С</div>
-                    <h3 class="review-author">Сергей</h3>
-                </div>
-                <p class="review-text">Хороший, аккуратный сайт. Ничего лишнего — открыл и пошёл по маршруту. Удобно, что всё собрано в одном месте: куда сходить, где поесть, где остановиться. Мы были компанией, и сайт помог быстро решить "что делаем сегодня", без долгих поисков.</p>
-            </div>
-            </div>
+            <button class="carousel-btn carousel-btn-next" aria-label="Следующий отзыв">›</button>
+            <div class="carousel-dots" id="carouselDots"></div>
         </div>
     </section>
 
@@ -1659,48 +1779,137 @@
             }
         });
 
-        // Сворачиваемый блок отзывов на мобильных
-        const reviewsTitle = document.getElementById('reviews-title');
-        const reviewsContent = document.querySelector('.reviews-content');
-        const reviewsToggleIcon = document.querySelector('.reviews-toggle-icon');
-
-        function toggleReviews() {
-            if (window.innerWidth < 768 && reviewsContent && reviewsToggleIcon) {
-                reviewsContent.classList.toggle('expanded');
-                
-                // Меняем иконку
-                if (reviewsContent.classList.contains('expanded')) {
-                    reviewsToggleIcon.textContent = '▼';
-                } else {
-                    reviewsToggleIcon.textContent = '▶';
-                }
-            }
-        }
-
-        // Инициализация состояния на мобильных
-        function initReviewsState() {
-            if (reviewsContent && reviewsToggleIcon) {
-                if (window.innerWidth < 768) {
-                    reviewsContent.classList.remove('expanded');
-                    reviewsToggleIcon.textContent = '▶';
-                } else {
-                    reviewsContent.classList.add('expanded');
-                    reviewsToggleIcon.textContent = '▼';
-                }
-            }
-        }
-
-        // Инициализация при загрузке
+        // Карусель отзывов
         document.addEventListener('DOMContentLoaded', () => {
-            initReviewsState();
-            if (reviewsTitle) {
-                reviewsTitle.addEventListener('click', toggleReviews);
-            }
-        });
+            const carouselTrack = document.getElementById('carouselTrack');
+            const carouselDots = document.getElementById('carouselDots');
+            const prevBtn = document.querySelector('.carousel-btn-prev');
+            const nextBtn = document.querySelector('.carousel-btn-next');
+            const reviewCards = document.querySelectorAll('.review-card');
+            
+            if (!carouselTrack || !carouselDots || !prevBtn || !nextBtn || reviewCards.length === 0) return;
 
-        // Обработка изменения размера окна
-        window.addEventListener('resize', () => {
-            initReviewsState();
+            let currentIndex = 0;
+            let slidesToShow = 3;
+            let autoplayInterval;
+
+            // Определяем количество слайдов для показа
+            function updateSlidesToShow() {
+                if (window.innerWidth >= 1024) {
+                    slidesToShow = 3;
+                } else if (window.innerWidth >= 768) {
+                    slidesToShow = 2;
+                } else {
+                    slidesToShow = 1;
+                }
+                updateCarousel();
+            }
+
+            // Создаем точки-индикаторы
+            function createDots() {
+                const totalSlides = reviewCards.length;
+                const dotsCount = Math.ceil(totalSlides / slidesToShow);
+                carouselDots.innerHTML = '';
+                
+                for (let i = 0; i < dotsCount; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'carousel-dot';
+                    if (i === 0) dot.classList.add('active');
+                    dot.setAttribute('aria-label', `Перейти к слайду ${i + 1}`);
+                    dot.addEventListener('click', () => goToSlide(i));
+                    carouselDots.appendChild(dot);
+                }
+            }
+
+            // Обновляем карусель
+            function updateCarousel() {
+                if (reviewCards.length === 0) return;
+                
+                const wrapper = carouselTrack.parentElement;
+                const wrapperWidth = wrapper.offsetWidth;
+                const margin = slidesToShow === 1 ? 0 : 32; // На мобильных нет margin
+                const cardWidth = (wrapperWidth - (slidesToShow - 1) * margin) / slidesToShow;
+                const offset = -currentIndex * (cardWidth + margin);
+                carouselTrack.style.transform = `translateX(${offset}px)`;
+                
+                // Обновляем активную точку
+                const dots = carouselDots.querySelectorAll('.carousel-dot');
+                const dotIndex = Math.floor(currentIndex / slidesToShow);
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === dotIndex);
+                });
+            }
+
+            // Переход к конкретному слайду
+            function goToSlide(dotIndex) {
+                const maxIndex = Math.max(0, Math.ceil(reviewCards.length / slidesToShow) - 1);
+                currentIndex = Math.min(dotIndex * slidesToShow, reviewCards.length - slidesToShow);
+                if (currentIndex < 0) currentIndex = 0;
+                updateCarousel();
+            }
+
+            // Следующий слайд
+            function nextSlide() {
+                const maxIndex = Math.max(0, reviewCards.length - slidesToShow);
+                currentIndex += slidesToShow;
+                if (currentIndex > maxIndex) {
+                    currentIndex = 0; // Бесконечная карусель
+                }
+                updateCarousel();
+            }
+
+            // Предыдущий слайд
+            function prevSlide() {
+                const maxIndex = Math.max(0, reviewCards.length - slidesToShow);
+                currentIndex -= slidesToShow;
+                if (currentIndex < 0) {
+                    currentIndex = maxIndex; // Бесконечная карусель
+                }
+                updateCarousel();
+            }
+
+            // Автопрокрутка
+            function startAutoplay() {
+                autoplayInterval = setInterval(nextSlide, 5000);
+            }
+
+            function stopAutoplay() {
+                if (autoplayInterval) {
+                    clearInterval(autoplayInterval);
+                    autoplayInterval = null;
+                }
+            }
+
+            // Обработчики событий
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                stopAutoplay();
+                startAutoplay();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                stopAutoplay();
+                startAutoplay();
+            });
+
+            // Остановка автопрокрутки при наведении
+            const carouselContainer = document.querySelector('.carousel-container');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', stopAutoplay);
+                carouselContainer.addEventListener('mouseleave', startAutoplay);
+            }
+
+            // Обработка изменения размера окна
+            window.addEventListener('resize', () => {
+                updateSlidesToShow();
+                createDots();
+            });
+
+            // Инициализация
+            updateSlidesToShow();
+            createDots();
+            startAutoplay();
         });
 
     </script>
